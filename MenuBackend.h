@@ -1,7 +1,7 @@
 /*
    ||
    || @file 	MenuBackend.h
-   || @version 1.5
+   || @version 1.6
    || @author 	Alexander Brevig
    || @contact alexanderbrevig@gmail.com
    || @contribution Adrian Brzezinski adrb@wp.pl, http://www.arduino.cc/cgi-bin/yabb2/YaBB.pl?action=viewprofile;username=vzhang
@@ -36,15 +36,24 @@
    A menu item will be a container for an item that is a part of a menu
    Each such item has a logical position in the hierarchy as well as a text and maybe a mnemonic shortkey
  */
+
+class MenuBackend;
  
 class MenuItem {
+  friend class MenuBackend;
+
   public:
     MenuItem(const char* itemName, char shortKey='\0' ) : name(itemName), shortkey(shortKey) {
+      name = itemName;
       before = right = after = left = 0;
     }
 
-    //void use(){} //update some internal data / statistics
-    inline const char* getName() const { return name; }
+    MenuItem(const String& itemName, char shortKey='\0' ) : name(itemName), shortkey(shortKey) {
+      name = itemName;
+      before = right = after = left = 0;
+    }
+
+    inline const String& getName() const { return name; }
     inline char getShortkey() const { return shortkey; }
     inline bool hasShortkey() const { return (shortkey!='\0'); }
     inline void setBack(MenuItem *b) { back = b; }
@@ -97,6 +106,7 @@ class MenuItem {
     MenuItem &addAfter(MenuItem &mi) {
       mi.before = this;
       after = &mi;
+      if ( !mi.left ) mi.left = left;
       if ( !mi.back ) mi.back = back;
       return mi;
     }
@@ -106,9 +116,20 @@ class MenuItem {
       if ( !mi.back ) mi.back = back;
       return mi;
     }
-  protected:
 
-    const char* name;
+  public:
+    bool operator==(const char* test) const {
+      return (getName() == test);
+    }
+    bool operator==(const String& test) const {
+      return (getName() == test);
+    }
+    bool operator==(const MenuItem &rhs) const {
+      return (getName() == rhs.getName());
+    }
+
+  private:
+    String name;
     const char shortkey;
 
     MenuItem *before;
@@ -117,24 +138,6 @@ class MenuItem {
     MenuItem *left;
     MenuItem *back;
 };
-
-//no dependant inclusion of string or cstring
-inline bool menuTestStrings(const char *a, const char *b) {
-  while (*a) { if (*a != *b) { return false; } b++; a++; }
-  return true;
-}
-inline bool operator==(MenuItem &lhs, char* test) {
-  return menuTestStrings(lhs.getName(),test);
-}
-inline bool operator==(const MenuItem &lhs, char* test) {
-  return menuTestStrings(lhs.getName(),test);
-}
-inline bool operator==(MenuItem &lhs, MenuItem &rhs) {
-  return menuTestStrings(lhs.getName(),rhs.getName());
-}
-inline bool operator==(const MenuItem &lhs, MenuItem &rhs) {
-  return menuTestStrings(lhs.getName(),rhs.getName());
-}
 
 struct MenuChangeEvent {
   const MenuItem &from;
@@ -154,6 +157,7 @@ class MenuBackend {
 
     MenuBackend(cb_use menuUse, cb_change menuChange = 0) : root("MenuRoot") {
       current = &root;
+      root.left = &root;
       cb_menuChange = menuChange;
       cb_menuUse = menuUse;
     }
