@@ -5,8 +5,7 @@ MenuBacked was written by Alexander Brevig, and updated by Adrian Brzezinski (v1
 
 The differences between v1.4 and v1.5 can be seen here: https://github.com/Orange-Cat/MenuBackend/commit/551306a894889a07969dacb866662097d0b1c945?w=1
 
-Version v1.6 is a significant departure in that it uses String objects instead of char arrays. v1.6 also sets up the left menu
-item automatically (so that it is much simpler and move obvious to move back).
+Version v1.6 sets up the left menu item automatically (so that it is much simpler and move obvious to move back).
 
 **License:**
 Published under the terms of the version 2.1 of the GNU Lesser General Public License (see MenuBacked.h for details).

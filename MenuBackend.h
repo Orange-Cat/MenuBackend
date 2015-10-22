@@ -36,24 +36,19 @@
    A menu item will be a container for an item that is a part of a menu
    Each such item has a logical position in the hierarchy as well as a text and maybe a mnemonic shortkey
  */
-
-class MenuBackend;
  
+class MenuBackend;
+
 class MenuItem {
   friend class MenuBackend;
 
   public:
     MenuItem(const char* itemName, char shortKey='\0' ) : name(itemName), shortkey(shortKey) {
-      name = itemName;
       before = right = after = left = 0;
     }
 
-    MenuItem(const String& itemName, char shortKey='\0' ) : name(itemName), shortkey(shortKey) {
-      name = itemName;
-      before = right = after = left = 0;
-    }
-
-    inline const String& getName() const { return name; }
+    //void use(){} //update some internal data / statistics
+    inline const char* getName() const { return name; }
     inline char getShortkey() const { return shortkey; }
     inline bool hasShortkey() const { return (shortkey!='\0'); }
     inline void setBack(MenuItem *b) { back = b; }
@@ -106,7 +101,6 @@ class MenuItem {
     MenuItem &addAfter(MenuItem &mi) {
       mi.before = this;
       after = &mi;
-      if ( !mi.left ) mi.left = left;
       if ( !mi.back ) mi.back = back;
       return mi;
     }
@@ -117,19 +111,23 @@ class MenuItem {
       return mi;
     }
 
-  public:
-    bool operator==(const char* test) const {
-      return (getName() == test);
-    }
-    bool operator==(const String& test) const {
-      return (getName() == test);
-    }
-    bool operator==(const MenuItem &rhs) const {
-      return (getName() == rhs.getName());
+ public:
+    //no dependant inclusion of string or cstring
+    bool menuTestStrings(const char *a, const char *b) const {
+      while (*a) { if (*a != *b) { return false; } b++; a++; }
+      return true;
     }
 
-  private:
-    String name;
+   bool operator==(const char* test) const {
+     return menuTestStrings(getName(), test);
+   }
+
+   bool operator==(const MenuItem &rhs) const {
+     return menuTestStrings(getName(), rhs.getName());
+   }
+
+  protected:
+    const char* name;
     const char shortkey;
 
     MenuItem *before;
