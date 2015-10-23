@@ -44,22 +44,28 @@ class MenuItem {
 
   public:
     MenuItem(const char* itemName, char shortKey='\0' ) : name(itemName), shortkey(shortKey) {
+      flash_name = NULL;
+      before = right = after = left = 0;
+    }
+    MenuItem(const __FlashStringHelper* itemName, char shortKey='\0' ) : flash_name(itemName), shortkey(shortKey) {
+      name = NULL;
       before = right = after = left = 0;
     }
 
-    //void use(){} //update some internal data / statistics
-    inline const char* getName() const { return name; }
-    inline char getShortkey() const { return shortkey; }
-    inline bool hasShortkey() const { return (shortkey!='\0'); }
-    inline void setBack(MenuItem *b) { back = b; }
-    inline void setBack(MenuItem &b) { back = &b; }
-    inline void setLeft(MenuItem *l) { left = l; }
-    inline void setLeft(MenuItem &l) { left = &l; }
-    inline MenuItem* getBack() const { return back; }
-    inline MenuItem* getBefore() const { return before; }
-    inline MenuItem* getRight() const { return right; }
-    inline MenuItem* getAfter() const { return after; }
-    inline MenuItem* getLeft() const { return left; }
+    const char* getName() const { return name; }
+    const __FlashStringHelper* getFlashName() const { return flash_name; }
+
+    char getShortkey() const { return shortkey; }
+    bool hasShortkey() const { return (shortkey!='\0'); }
+    void setBack(MenuItem *b) { back = b; }
+    void setBack(MenuItem &b) { back = &b; }
+    void setLeft(MenuItem *l) { left = l; }
+    void setLeft(MenuItem &l) { left = &l; }
+    MenuItem* getBack() const { return back; }
+    MenuItem* getBefore() const { return before; }
+    MenuItem* getRight() const { return right; }
+    MenuItem* getAfter() const { return after; }
+    MenuItem* getLeft() const { return left; }
 
     MenuItem *moveBack() { return back; }
 
@@ -101,6 +107,7 @@ class MenuItem {
     MenuItem &addAfter(MenuItem &mi) {
       mi.before = this;
       after = &mi;
+      if ( !mi.left ) mi.left = left;
       if ( !mi.back ) mi.back = back;
       return mi;
     }
@@ -112,22 +119,31 @@ class MenuItem {
     }
 
  public:
-    //no dependant inclusion of string or cstring
-    bool menuTestStrings(const char *a, const char *b) const {
-      while (*a) { if (*a != *b) { return false; } b++; a++; }
-      return true;
-    }
-
    bool operator==(const char* test) const {
-     return menuTestStrings(getName(), test);
+    if (getName() != NULL)
+       return String(getName()) == String(test);
+    else
+       return String(getFlashName()) == String(test);
    }
 
    bool operator==(const MenuItem &rhs) const {
-     return menuTestStrings(getName(), rhs.getName());
+    if (getName() != NULL) { 
+      if (rhs.getName() != NULL)
+       return String(getName()) == String(rhs.getName());
+      else
+       return String(getName()) == String(rhs.getFlashName());
+    }
+    else if (getFlashName() != NULL) {
+      if (rhs.getName() != NULL)
+       return String(getFlashName()) == String(rhs.getName());
+      else
+       return String(getFlashName()) == String(rhs.getFlashName());
+    }
    }
 
   protected:
     const char* name;
+    const __FlashStringHelper* flash_name;
     const char shortkey;
 
     MenuItem *before;
