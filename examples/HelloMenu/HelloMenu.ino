@@ -70,9 +70,9 @@ void menuUseEvent(MenuUseEvent used)
 {
 	Serial.print("Menu use ");
 	Serial.println(used.item.getName());
-	if (used.item == setDelay) //comparison agains a known item
+	if (used.item == "Delay") //comparison agains a known item
 	{
-		Serial.println("menuUseEvent found Dealy (D)");
+		Serial.println("menuUseEvent found Delay (D)");
 	}
 }
 

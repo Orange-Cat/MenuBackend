@@ -32,6 +32,9 @@
 #ifndef MenuBackend_h
 #define MenuBackend_h
 
+#include <Arduino.h>
+#include <String.h>
+
 /*
    A menu item will be a container for an item that is a part of a menu
    Each such item has a logical position in the hierarchy as well as a text and maybe a mnemonic shortkey
@@ -121,21 +124,28 @@ class MenuItem {
  public:
    bool operator==(const char* test) const {
     if (getName() != NULL)
-       return String(getName()) == String(test);
+       return String(getName()) == test;
     else
-       return String(getFlashName()) == String(test);
+       return String(getFlashName()) == test;
+   }
+
+   bool operator==(const String& test) const {
+    if (getName() != NULL)
+       return String(getName()) == test;
+    else
+       return String(getFlashName()) == test;
    }
 
    bool operator==(const MenuItem &rhs) const {
     if (getName() != NULL) { 
       if (rhs.getName() != NULL)
-       return String(getName()) == String(rhs.getName());
+       return String(getName()) == rhs.getName();
       else
        return String(getName()) == String(rhs.getFlashName());
     }
-    else if (getFlashName() != NULL) {
+    else {
       if (rhs.getName() != NULL)
-       return String(getFlashName()) == String(rhs.getName());
+       return String(getFlashName()) == rhs.getName();
       else
        return String(getFlashName()) == String(rhs.getFlashName());
     }
