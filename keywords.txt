@@ -20,12 +20,15 @@ getShortkey	KEYWORD2
 getRoot	KEYWORD2
 getCurrent	KEYWORD2
 getName	KEYWORD2
+setBack KEYWORD2
+setLeft KEYWORD2
 getBack	KEYWORD2
 getBefore	KEYWORD2
 getRight	KEYWORD2
 getAfter	KEYWORD2
 getLeft	KEYWORD2
 use	KEYWORD2
+toRoot KEYWORD2
 moveBack	KEYWORD2
 moveUp	KEYWORD2
 moveDown	KEYWORD2
